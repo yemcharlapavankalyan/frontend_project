@@ -1,0 +1,4 @@
+# never upload secrets
+.env
+config.js
+
