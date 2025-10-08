@@ -18,7 +18,7 @@ npm run dev
 
 ### Tech
 
-- React 19, Vite, Tailwind CSS 4
+- React 19, Vite
 - React Router, useReducer state, localStorage persistence
 - Framer Motion ready (installed)
 
