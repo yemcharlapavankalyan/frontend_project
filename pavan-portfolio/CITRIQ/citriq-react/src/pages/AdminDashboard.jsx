@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const AdminDashboard = () => {
-  const { projects, users, addProject, deleteProject } = useApp();
+  const { projects, users, addProject, deleteProject, isLoading } = useApp();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showSubmissions, setShowSubmissions] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [newProject, setNewProject] = useState({
     title: '',
     description: '',
@@ -11,9 +14,9 @@ const AdminDashboard = () => {
     assignedStudents: []
   });
 
-  const handleAddProject = (e) => {
+  const handleAddProject = async (e) => {
     e.preventDefault();
-    addProject({
+    await addProject({
       ...newProject,
       status: 'active',
       assignedStudents: newProject.assignedStudents.map(id => parseInt(id))
@@ -36,7 +39,16 @@ const AdminDashboard = () => {
     }));
   };
 
+  const handleViewSubmissions = (projectId) => {
+    setSelectedProject(projectId);
+    setShowSubmissions(true);
+  };
+
   const students = users.filter(user => user.role === 'student');
+
+  if (isLoading && projects.length === 0) {
+    return <LoadingSpinner message="Loading projects..." />;
+  }
 
   return (
     <div>
@@ -106,11 +118,18 @@ const AdminDashboard = () => {
             </div>
             
             <div style={{ display: 'flex', gap: '1rem' }}>
-              <button type="submit" className="btn btn-primary">Create Project</button>
+              <button 
+                type="submit" 
+                className="btn btn-primary"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Creating...' : 'Create Project'}
+              </button>
               <button 
                 type="button" 
                 className="btn btn-secondary"
                 onClick={() => setShowAddForm(false)}
+                disabled={isLoading}
               >
                 Cancel
               </button>
@@ -156,19 +175,33 @@ const AdminDashboard = () => {
               </div>
             </div>
             
-            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <span style={{ fontSize: '0.875rem', color: '#666' }}>
                   Reviews: {project.reviews.length} | 
                   Submissions: {project.submissions.length}
                 </span>
               </div>
-              <button 
-                className="btn btn-danger btn-sm"
-                onClick={() => deleteProject(project.id)}
-              >
-                Delete
-              </button>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button 
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => handleViewSubmissions(project.id)}
+                  disabled={project.submissions.length === 0}
+                >
+                  View Submissions
+                </button>
+                <button 
+                  className="btn btn-danger btn-sm"
+                  onClick={async () => {
+                    if (window.confirm(`Are you sure you want to delete "${project.title}"? This action cannot be undone.`)) {
+                      await deleteProject(project.id);
+                    }
+                  }}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -179,6 +212,91 @@ const AdminDashboard = () => {
           <div className="empty-state-icon">📝</div>
           <h3>No projects yet</h3>
           <p>Create your first peer review project to get started.</p>
+        </div>
+      )}
+
+      {/* Submissions Modal */}
+      {showSubmissions && selectedProject && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div className="card" style={{ maxWidth: '800px', width: '90%', maxHeight: '80vh', overflow: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h2 className="card-title">
+                Submissions for "{projects.find(p => p.id === selectedProject)?.title}"
+              </h2>
+              <button 
+                className="btn btn-secondary btn-sm"
+                onClick={() => setShowSubmissions(false)}
+              >
+                ✕ Close
+              </button>
+            </div>
+            
+            {projects.find(p => p.id === selectedProject)?.submissions.length === 0 ? (
+              <div className="empty-state" style={{ padding: '2rem' }}>
+                <div className="empty-state-icon">📄</div>
+                <h3>No submissions yet</h3>
+                <p>Students haven't submitted their work for this project yet.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {projects.find(p => p.id === selectedProject)?.submissions.map((submission, index) => {
+                  const student = users.find(u => u.id === submission.studentId);
+                  return (
+                    <div key={submission.id || index} style={{
+                      padding: '1rem',
+                      backgroundColor: '#f7fafc',
+                      borderRadius: '6px',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <h4 style={{ margin: 0 }}>{student?.name || 'Unknown Student'}</h4>
+                        <span style={{ fontSize: '0.875rem', color: '#666' }}>
+                          Submitted: {new Date(submission.submittedAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div style={{ marginBottom: '0.5rem' }}>
+                        <strong>Status:</strong> 
+                        <span style={{ 
+                          marginLeft: '0.5rem',
+                          padding: '0.25rem 0.5rem',
+                          backgroundColor: '#c6f6d5',
+                          color: '#22543d',
+                          borderRadius: '4px',
+                          fontSize: '0.875rem'
+                        }}>
+                          {submission.status || 'Submitted'}
+                        </span>
+                      </div>
+                      <div>
+                        <strong>Content:</strong>
+                        <div style={{ 
+                          marginTop: '0.5rem',
+                          padding: '0.75rem',
+                          backgroundColor: 'white',
+                          borderRadius: '4px',
+                          border: '1px solid #e2e8f0',
+                          whiteSpace: 'pre-wrap'
+                        }}>
+                          {submission.content}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

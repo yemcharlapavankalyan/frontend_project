@@ -13,10 +13,10 @@ const ReviewPage = () => {
   const project = getProjectById(parseInt(projectId));
   const peers = project?.assignedStudents.filter(id => id !== user?.id) || [];
 
-  const handleSubmitReview = (e) => {
+  const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (selectedPeer && rating > 0 && comment.trim()) {
-      addReview(parseInt(projectId), {
+      await addReview(parseInt(projectId), {
         reviewerId: user.id,
         revieweeId: parseInt(selectedPeer),
         rating,
@@ -67,12 +67,14 @@ const ReviewPage = () => {
         <div className="card">
           <div className="card-header">
             <h3 className="card-title">Submit Review</h3>
-            <button 
-              className="btn btn-primary btn-sm"
-              onClick={() => setShowForm(true)}
-            >
-              + Add Review
-            </button>
+            {!showForm && (
+              <button 
+                className="btn btn-primary btn-sm"
+                onClick={() => setShowForm(true)}
+              >
+                + Add Review
+              </button>
+            )}
           </div>
           
           {showForm && (

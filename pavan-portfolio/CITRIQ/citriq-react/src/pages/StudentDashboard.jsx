@@ -1,31 +1,55 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const StudentDashboard = () => {
-  const { user, getProjectsByUserId, getSubmissionsByUserId } = useApp();
+  const { user, getProjectsByUserId, getSubmissionsByUserId, addSubmission, isLoading } = useApp();
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [submissionContent, setSubmissionContent] = useState('');
+  const [submissionSuccess, setSubmissionSuccess] = useState(false);
 
   const userProjects = getProjectsByUserId(user?.id || 0);
   const userSubmissions = getSubmissionsByUserId(user?.id || 0);
 
-  const handleSubmitWork = (e) => {
+  const handleSubmitWork = async (e) => {
     e.preventDefault();
     if (selectedProject && submissionContent) {
-      // This would be handled by the context in a real app
-      console.log('Submitting work:', { projectId: selectedProject, content: submissionContent });
+      // Submit the work using the context method (now async)
+      await addSubmission(selectedProject, {
+        studentId: user.id,
+        content: submissionContent,
+        status: 'submitted'
+      });
+      
+      // Show success message and reset form
+      setSubmissionSuccess(true);
       setShowSubmitForm(false);
       setSelectedProject(null);
       setSubmissionContent('');
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setSubmissionSuccess(false);
+      }, 3000);
     }
   };
+
+  if (isLoading && userProjects.length === 0) {
+    return <LoadingSpinner message="Loading your projects..." />;
+  }
 
   return (
     <div>
       <h1 className="page-title">CITRIQ - Student Dashboard</h1>
       <p className="page-subtitle">View your assigned projects and submit your work</p>
+
+      {submissionSuccess && (
+        <div className="alert alert-success">
+           Your work has been submitted successfully!
+        </div>
+      )}
 
       <div className="grid grid-2">
         {userProjects.map(project => (
@@ -95,7 +119,7 @@ const StudentDashboard = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
+          backgroundColor: 'rgba(19, 11, 11, 0.5)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -104,22 +128,36 @@ const StudentDashboard = () => {
           <div className="card" style={{ maxWidth: '500px', width: '90%' }}>
             <h2 className="card-title">Submit Work</h2>
             <form onSubmit={handleSubmitWork}>
-              <div className="form-group">
-                <label className="form-label">Project</label>
-                <select 
-                  className="form-select"
-                  value={selectedProject || ''}
-                  onChange={(e) => setSelectedProject(parseInt(e.target.value))}
-                  required
-                >
-                  <option value="">Select a project...</option>
-                  {userProjects.map(project => (
-                    <option key={project.id} value={project.id}>
-                      {project.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {selectedProject ? (
+                <div className="form-group">
+                  <label className="form-label">Project</label>
+                  <div style={{ 
+                    padding: '0.75rem', 
+                    backgroundColor: '#f7fafc', 
+                    borderRadius: '6px',
+                    border: '1px solid #e2e8f0'
+                  }}>
+                    {userProjects.find(p => p.id === selectedProject)?.title || 'Selected Project'}
+                  </div>
+                </div>
+              ) : (
+                <div className="form-group">
+                  <label className="form-label">Project</label>
+                  <select 
+                    className="form-select"
+                    value={selectedProject || ''}
+                    onChange={(e) => setSelectedProject(parseInt(e.target.value))}
+                    required
+                  >
+                    <option value="">Select a project...</option>
+                    {userProjects.map(project => (
+                      <option key={project.id} value={project.id}>
+                        {project.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               
               <div className="form-group">
                 <label className="form-label">Work Description</label>
@@ -133,11 +171,22 @@ const StudentDashboard = () => {
               </div>
               
               <div style={{ display: 'flex', gap: '1rem' }}>
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Submitting...' : 'Submit'}
+                </button>
                 <button 
                   type="button" 
                   className="btn btn-secondary"
-                  onClick={() => setShowSubmitForm(false)}
+                  onClick={() => {
+                    setShowSubmitForm(false);
+                    setSelectedProject(null);
+                    setSubmissionContent('');
+                  }}
+                  disabled={isLoading}
                 >
                   Cancel
                 </button>
