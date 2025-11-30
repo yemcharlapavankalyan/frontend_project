@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Student Details - Vanilla JS and React</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<div class="max-w-5xl mx-auto p-6 space-y-12">
+  <header class="space-y-1">
+    <h1 class="text-3xl font-bold">Student Details</h1>
+    <p class="text-gray-600">Vanilla JavaScript and React implementations</p>
+  </header>
+
+  <!-- Vanilla JS Implementation -->
+  <section class="bg-white rounded-lg shadow border border-gray-200">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-xl font-semibold">Vanilla JavaScript</h2>
+      <p class="text-sm text-gray-600">Validations: ID not empty, Name ≥ 3 chars, CGPA 0-10</p>
+    </div>
+    <div class="p-6 space-y-6">
+      <form id="student-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div>
+          <label for="studentId" class="block text-sm font-medium">Student ID</label>
+          <input id="studentId" type="text" class="mt-1 w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500" placeholder="e.g., M109" />
+        </div>
+        <div>
+          <label for="studentName" class="block text-sm font-medium">Name</label>
+          <input id="studentName" type="text" class="mt-1 w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500" placeholder="e.g., Vara Prasad" />
+        </div>
+        <div>
+          <label for="studentCgpa" class="block text-sm font-medium">CGPA</label>
+          <input id="studentCgpa" type="number" step="0.01" class="mt-1 w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500" placeholder="0 - 10" />
+        </div>
+        <button type="submit" class="h-10 px-4 rounded-md bg-blue-600 text-white font-semibold">Add Student</button>
+      </form>
+
+      <p id="form-error" class="hidden text-red-600 text-sm"></p>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-left">
+          <thead>
+            <tr class="border-b">
+              <th class="py-2 pr-4 font-medium text-gray-700">Student ID</th>
+              <th class="py-2 px-4 font-medium text-gray-700">Name</th>
+              <th class="py-2 pl-4 font-medium text-gray-700">CGPA</th>
+            </tr>
+          </thead>
+          <tbody id="students-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- React Implementation -->
+  <section class="bg-white rounded-lg shadow border border-gray-200">
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-xl font-semibold">React (CDN) App</h2>
+      <p class="text-sm text-gray-600">Same validations implemented using React</p>
+    </div>
+    <div class="p-6 space-y-6">
+      <div id="root"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+  (function() {
+    const form = document.getElementById('student-form');
+    const errorEl = document.getElementById('form-error');
+    const tbody = document.getElementById('students-tbody');
+    /** @type {{id:string,name:string,cgpa:number}[]} */
+    const students = [];
+
+    function showError(message) {
+      errorEl.textContent = message;
+      errorEl.classList.toggle('hidden', !message);
+    }
+
+    function appendRow(student) {
+      const tr = document.createElement('tr');
+      tr.className = 'border-b';
+      tr.innerHTML = `<td class="py-2 pr-4">${student.id}</td>
+                      <td class="py-2 px-4">${student.name}</td>
+                      <td class="py-2 pl-4">${student.cgpa.toFixed(2)}</td>`;
+      tbody.appendChild(tr);
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const id = document.getElementById('studentId').value.trim();
+      const name = document.getElementById('studentName').value.trim();
+      const cgpaStr = document.getElementById('studentCgpa').value.trim();
+      const cgpa = Number(cgpaStr);
+
+      if (!id) {
+        showError('Student ID should not be empty.');
+        return;
+      }
+      if (name.length < 3) {
+        showError('Name should have at least 3 characters.');
+        return;
+      }
+      if (!Number.isFinite(cgpa) || cgpa < 0 || cgpa > 10) {
+        showError('CGPA should be a number between 0 and 10.');
+        return;
+      }
+
+
+      showError('');
+      const student = { id, name, cgpa };
+      students.push(student);
+      appendRow(student);
+      form.reset();
+    });
+  })();
+</script>
+
+<!-- React via CDN -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+  function useStudentForm() {
+    const [id, setId] = React.useState('');
+    const [name, setName] = React.useState('');
+    const [cgpa, setCgpa] = React.useState('');
+    const [error, setError] = React.useState('');
+    const [students, setStudents] = React.useState([]);
+
+    function validate() {
+      if (!id.trim()) return 'Student ID should not be empty.';
+      if (name.trim().length < 3) return 'Name should have at least 3 characters.';
+      const cg = Number(cgpa);
+      if (!Number.isFinite(cg) || cg < 0 || cg > 10) return 'CGPA should be a number between 0 and 10.';
+      return '';
+    }
+
+    function onSubmit(e) {
+      e.preventDefault();
+      const msg = validate();
+      if (msg) {
+        setError(msg);
+        return;
+      }
+      setError('');
+      setStudents(prev => [...prev, { id: id.trim(), name: name.trim(), cgpa: Number(cgpa) }]);
+      setId('');
+      setName('');
+      setCgpa('');
+    }
+
+    return { id, setId, name, setName, cgpa, setCgpa, error, students, onSubmit };
+  }
+
+  function App() {
+    const { id, setId, name, setName, cgpa, setCgpa, error, students, onSubmit } = useStudentForm();
+    return (
+      <div className="space-y-6">
+        <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div>
+            <label htmlFor="rid" className="block text-sm font-medium">Student ID</label>
+            <input id="rid" value={id} onChange={e => setId(e.target.value)} type="text" className="mt-1 w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500" placeholder="e.g., M109" />
+          </div>
+          <div>
+            <label htmlFor="rname" className="block text-sm font-medium">Name</label>
+            <input id="rname" value={name} onChange={e => setName(e.target.value)} type="text" className="mt-1 w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500" placeholder="e.g., Vara Prasad" />
+          </div>
+          <div>
+            <label htmlFor="rcgpa" className="block text-sm font-medium">CGPA</label>
+            <input id="rcgpa" value={cgpa} onChange={e => setCgpa(e.target.value)} type="number" step="0.01" className="mt-1 w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500" placeholder="0 - 10" />
+          </div>
+          <button type="submit" className="h-10 px-4 rounded-md bg-blue-600 text-white font-semibold">Add Student</button>
+        </form>
+        {error && <p className="text-red-600 text-sm">{error}</p>}
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left">
+            <thead>
+              <tr className="border-b">
+                <th className="py-2 pr-4 font-medium text-gray-700">Student ID</th>
+                <th className="py-2 px-4 font-medium text-gray-700">Name</th>
+                <th className="py-2 pl-4 font-medium text-gray-700">CGPA</th>
+              </tr>
+            </thead>
+            <tbody>
+              {students.map((s, i) => (
+                <tr key={i} className="border-b">
+                  <td className="py-2 pr-4">{s.id}</td>
+                  <td className="py-2 px-4">{s.name}</td>
+                  <td className="py-2 pl-4">{s.cgpa.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<App />);
+</script>
+</body>
+</html>
+

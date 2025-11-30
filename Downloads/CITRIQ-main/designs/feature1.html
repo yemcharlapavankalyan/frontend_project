@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CITRIQ Peer Review</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#0d7ff2",
+                "accent": "#00f5d4",
+                "background-light": "#f5f7f8",
+                "background-dark": "#101922",
+              },
+              fontFamily: {
+                "display": ["Space Grotesk", "sans-serif"]
+              },
+              borderRadius: {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+              },
+            },
+          },
+        }
+    </script>
+<style>
+        .glassmorphism {
+          background: rgba(16, 25, 34, 0.6);
+          -webkit-backdrop-filter: blur(20px);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .laser-highlight {
+            position: absolute;
+            background: radial-gradient(circle, rgba(0, 245, 212, 0.5) 0%, rgba(0, 245, 212, 0) 60%);
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 15px 5px rgba(0, 245, 212, 0.3);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 245, 212, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 10px 10px rgba(0, 245, 212, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 245, 212, 0); }
+        }
+        .holographic-marker {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--tw-color-accent);
+            border-radius: 50%;
+            background-color: rgba(0, 245, 212, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px var(--tw-color-accent), inset 0 0 10px var(--tw-color-accent);
+        }
+        .holographic-marker:hover {
+            transform: scale(1.2);
+            background-color: rgba(0, 245, 212, 0.3);
+        }
+        .holographic-marker::before, .holographic-marker::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid var(--tw-color-accent);
+            opacity: 0.5;
+        }
+        .holographic-marker::before {
+            transform: scale(1.5);
+            animation: spin 4s linear infinite;
+        }
+        .holographic-marker::after {
+            transform: scale(1.2);
+            animation: spin 6s linear infinite reverse;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg) scale(1.2); }
+            to { transform: rotate(360deg) scale(1.2); }
+        }
+        .feedback-panel-open {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .feedback-panel-closed {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-white selection:bg-accent selection:text-black">
+<div class="flex min-h-screen">
+<aside class="w-20 bg-background-dark/50 p-4 flex flex-col justify-between items-center border-r border-white/10">
+<div>
+<div class="flex items-center justify-center mb-10">
+<img src="citriq white.png" alt="CITRIQ Logo" class="w-10 h-10 rounded-full object-contain">
+</div>
+<nav class="flex flex-col gap-6">
+<a class="flex items-center justify-center h-12 w-12 rounded-lg text-gray-300 hover:bg-primary/20 hover:text-primary transition-colors" href="#" title="Dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+</a>
+<a class="flex items-center justify-center h-12 w-12 rounded-lg text-gray-300 hover:bg-primary/20 hover:text-primary transition-colors" href="#" title="Projects">
+<span class="material-symbols-outlined">folder_open</span>
+</a>
+<a class="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/20 text-primary transition-colors" href="#" title="Reviews">
+<span class="material-symbols-outlined">rate_review</span>
+</a>
+<a class="flex items-center justify-center h-12 w-12 rounded-lg text-gray-300 hover:bg-primary/20 hover:text-primary transition-colors" href="#" title="Messages">
+<span class="material-symbols-outlined">chat_bubble</span>
+</a>
+</nav>
+</div>
+<a class="flex items-center justify-center h-12 w-12 rounded-lg text-gray-300 hover:bg-primary/20 hover:text-primary transition-colors" href="#" title="Settings">
+<span class="material-symbols-outlined">settings</span>
+</a>
+</aside>
+<main class="flex-1 flex flex-col p-6 overflow-hidden">
+<header class="flex justify-between items-center mb-6">
+<div>
+<h1 class="text-3xl font-bold text-white">Peer Review: Aritificial Intelligence and Machine Learning</h1>
+<p class="text-gray-400">Reviewing submission by <span class="text-accent">Pavan Kalyan</span></p>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary text-primary font-bold hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined">info</span>
+<span>Guidelines</span>
+</button>
+<button class="px-6 py-2 bg-accent text-background-dark font-bold rounded-lg hover:bg-accent/80 transition-colors">
+                    Submit Review
+                </button>
+</div>
+</header>
+<div class="flex-1 bg-black/30 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden relative">
+<div class="absolute top-4 left-4 z-20 flex items-center gap-2">
+<button class="h-10 w-10 glassmorphism rounded-lg flex items-center justify-center text-accent hover:bg-accent/20 transition-colors" title="Add Highlight">
+<span class="material-symbols-outlined">format_ink_highlighter</span>
+</button>
+<button class="h-10 w-10 glassmorphism rounded-lg flex items-center justify-center text-accent hover:bg-accent/20 transition-colors" title="Add Comment">
+<span class="material-symbols-outlined">add_comment</span>
+</button>
+</div>
+<div class="w-full h-full relative p-12" id="document-preview">
+<div class="w-[8.5in] h-[11in] bg-white text-black p-12 shadow-2xl mx-auto overflow-y-auto relative">
+<h1 class="text-2xl font-bold mb-4">What is a Search Algorithm in AI?</h1>
+<p class="mb-4">A search algorithm is a step-by-step method used in computer science and artificial intelligence to find specific data from a collection of data structures (like arrays, trees, or graphs) or to explore possible solutions in a problem space.</p>
+<p class="mb-4"></p>Search algorithms can be categorized into two main types:</p><br>
+<p class="mb-4"><strong>1. Uninformed (Blind) Search</strong> Uninformed search algorithms are called blind search methods because they explore the search space without using any additional knowledge about the goal beyond the problem definition. They simply generate possible states and test them until they find a solution. These algorithms do not know whether one path is better than another; they just expand nodes systematically. Examples include Breadth-First Search (BFS), which explores level by level and guarantees the shortest path in unweighted graphs, and Depth-First Search (DFS), which explores as far as possible before backtracking. Another example is Uniform Cost Search (UCS), which always expands the node with the lowest path cost. While uninformed search is simple and guarantees a solution if one exists, it can be inefficient since it wastes time exploring paths that may not lead to the goal.</p>
+<p class="mb-4"><strong>2. Informed (Heuristic) Search</strong> Informed search algorithms, also called heuristic search methods, make use of extra knowledge or domain-specific information to guide the search process more efficiently. This additional knowledge is provided in the form of a heuristic function, which estimates how close a particular state is to the goal. By using heuristics, informed search algorithms prioritize exploring paths that are more likely to lead to the solution, thus reducing time and effort compared to blind search. For instance, Greedy Best-First Search selects the path that appears closest to the goal based on the heuristic, while the famous A* algorithm combines both the actual cost so far and the estimated cost to reach the goal, ensuring both optimality and efficiency if the heuristic is good. Informed search is widely applied in AI systems, pathfinding (like Google Maps), robotics, and game playing, since it provides smarter and faster solutions.</p>
+<div class="laser-highlight" style="top: 190px; left: 300px; width: 350px; height: 50px;"></div>
+<div class="holographic-marker" onclick="document.getElementById('feedbackPanel').classList.remove('feedback-panel-closed'); document.getElementById('feedbackPanel').classList.add('feedback-panel-open');" style="top: 310px; left: 600px;">
+<span class="font-bold text-accent">1</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<aside class="w-96 glassmorphism p-6 flex flex-col gap-6 fixed top-0 right-0 h-full border-l border-white/10 transition-transform duration-500 ease-in-out feedback-panel-closed z-50" id="feedbackPanel">
+<div class="flex items-center justify-between">
+<h2 class="text-2xl font-bold text-white">Feedback</h2>
+<button class="text-gray-400 hover:text-white" onclick="document.getElementById('feedbackPanel').classList.add('feedback-panel-closed'); document.getElementById('feedbackPanel').classList.remove('feedback-panel-open');">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto space-y-4 pr-2">
+<div class="p-4 rounded-lg bg-black/30">
+<div class="flex items-center gap-3 mb-2">
+<img alt="Alex avatar" class="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_BF_A4bP3rDLG0YV9auYgGAWZz8taaWTe2cBeTrv1ESSdMGq236EqeD9rRvUHPMdqEYQY7r5kBeO0xvCZ6VwZexWDhimGTf8h0Pyi2MOt0dYCf3jfdBP8qLfur3xLCYnaG5x3GEtknpltMRo_JN8tL_LB42kNFMh0lrNzTWzI1h8CoAKa5D3QPmu2cUZjovxOYUYP1qM1SBAL11hkMOp1-xI14Hg2R59Hy2aCdh8XDPeuJxj024IccMHpGAvwsriUDYK5NW11TGLS"/>
+<div>
+<p class="font-bold text-white">Pavan Kalyan (You)</p>
+<p class="text-xs text-gray-400">Just now</p>
+</div>
+</div>
+<p class="text-gray-300">Could you elaborate on the "probabilistic bit-flipping mechanism"? It might be helpful to include a more detailed mathematical formulation or a pseudo-code snippet for clarity.</p>
+</div>
+<div class="p-4 rounded-lg bg-primary/10">
+<div class="flex items-center gap-3 mb-2">
+<img alt="Sarah avatar" class="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrg1fkIEqkKe_K8PwxcsC5_xsroNVVQFUZoykapwsO2ylxYKEn6vEyx-DvuufK6HeL_FsO-GcpcotVKYkgKI7xMq7jd_OR0c1--Ly3SQmirMYH3vIvg0g78zLSRL53fyeznmRkYoaE09MDBmp9VCTbcZjH3RzQ4X2n_klMizZteIxq_yswcbv7qcdmynIfiTAI1b3_MqAsJju9V9tKqnLBptI1syMIGC9R4pYH7GcUmTml93v-ck2OwnNu5qkgg4dR9gQ9OKZz9DS9"/>
+<div>
+<p class="font-bold text-white">Achyuth</p>
+<p class="text-xs text-gray-400">Previous comment</p>
+</div>
+</div>
+<p class="text-gray-300">This section is the core of my thesis. Happy to discuss any points of confusion.</p>
+</div>
+</div>
+<div class="mt-auto">
+<textarea class="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-white placeholder-gray-500 focus:ring-accent focus:border-accent transition" placeholder="Add a comment..." rows="4"></textarea>
+<button class="w-full mt-2 px-6 py-3 bg-accent text-background-dark font-bold rounded-lg hover:bg-accent/80 transition-colors">
+              Add Comment
+            </button>
+</div>
+</aside>
+</div>
+
+</body></html>
